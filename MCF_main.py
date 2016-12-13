@@ -12,19 +12,33 @@ from MCF_emissionsCalc import *
 from MCF_utilities import *
 from MCF_timelineRevise import *
 from MCF_timelineRead_FMSStops_Old import *
+from MCF_travel_alternatives import *
 
 if __name__ == '__main__':
    
+    # Change the data directories in dataDir.json to your local directory. 
+    # Then, do not re-commit dataDir.json. Do not add data files to the GIT repository.
+    with open('dataDir.json') as dataFile:    
+        dataDirFile = json.load(dataFile)
+        
+    dataDir = os.path.normpath(dataDirFile['dataDir']) # data directory should be MCF Dropbox
+    
+    # set different output directory, so that temporary files do not upload to MCF Dropbox
+    dataOutDir = os.path.normpath(dataDirFile['dataOutDir'])  
+    
+    apifile = open(dataDir + '\\' + 'apiKey.txt', 'r')    
+    googleApiKey = apifile.readline()
+    
     # Activity code lookup file
     # contains only AVERAGE CO2 per minute or km. 
     # Future estimations (e.g. with emissions ranges) will require a new file format.
-    Afile = open('activityLookupSingapore.csv')
-    Areader = csv.reader(Afile)
-    A = list(Areader)
+    Afile = open(dataDir + '\\' + dataDirFile['activityLookup'])
+    A = list(csv.reader(Afile))
     aDict = csvToDict(A)
     
-    # FMS stops file input
-    stopFile = open('FMSStops_net_mtz.csv') # golden dataset (weekdays only)
+    # FMS data file input
+    # IMPORTANT: make sure there are TWO returns after the last data line, so that the CSV reader will read in the last data line 
+    stopFile = open(dataDir + '\\' + dataDirFile['FMSData']) # in dataDir.json, set the data filename
     stopsT = list(csv.reader(stopFile))
     
     stopsDict = csvToDict(stopsT) # change CSV file (with headers in first row) to python Dictionary
@@ -78,12 +92,26 @@ if __name__ == '__main__':
     # End REVISION Function code
     #==============================================================================
     
-    with open('timeline.json', 'w') as outfile:
-         json.dump(timeline1, outfile, indent=4, encoding="utf-8", sort_keys=True) # Change to indent=None to make minimized JSON file
+    with open(dataOutDir + '\\' + dataDirFile['FMSData'][0:-4] + '_timeline.json', 'w') as outfile1:
+         json.dump(timeline1, outfile1, indent=4, encoding="utf-8", sort_keys=True) # Change to indent=None to make minimized JSON file
     
+    tlTravelAltFile = dataOutDir + '\\' + dataDirFile['FMSData'][0:-4] + '_alternatives.json'
+    if os.path.exists(tlTravelAltFile):
+        print "alternative travel data file already exists"
+        #stops = [ row.strip().split(',') for row in file('FMSStops.csv') ]
+    else:
+        # Run this routine only if you need the travel alternatives for the current timeline.
+        # This routine uses up the Google Directions API Key allowance.
+        print googleApiKey
+        tlAlt = travelAlternatives(timeline1, googleApiKey)
+        with open(tlTravelAltFile, 'w') as outfile2:
+            json.dump(tlAlt, outfile2, indent=4, encoding="utf-8", sort_keys=True) # Change to indent=None to make minimized JSON file
+
     # TO DO: convert JSON/data dictionary to CSV field format    
     
     # Close all files        
+    dataFile.close()
     Afile.close()
     stopFile.close()
-
+    outfile1.close()
+    outfile2.close()
