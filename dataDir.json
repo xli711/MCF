@@ -2,5 +2,6 @@
 	"dataDir": "C:/Users/cressica/Dropbox (MIT)/MCF 2016/MCF_git_data/", 
 	"dataOutDir": "C:/Users/cressica/Desktop/python/",
 	"activityLookup": "activityLookupSingapore.csv", 
-	"FMSData": "FMSStops_net_mtz_subset.csv"
+	"FMSData": "FMSStops_net_mtz.csv",
+	"FMSDataPostalCode": "FMSStops_net_mtz_postalcode.csv"
 } 

@@ -11,7 +11,7 @@ from numbers import Number
 from MCF_emissionsCalc import *
 from MCF_utilities import *
 from MCF_timelineRevise import *
-from MCF_timelineRead_FMSStops_Old import *
+from MCF_timelineRead_FMSStops_Old import * # change this file import, in order to use different timelineRead function
 from MCF_travel_alternatives import *
 
 if __name__ == '__main__':
@@ -36,6 +36,11 @@ if __name__ == '__main__':
     A = list(csv.reader(Afile))
     aDict = csvToDict(A)
     
+	# Stop ID to Postal Code mapping file
+    stopPCfile = open(dataDir + '\\' + dataDirFile['FMSDataPostalCode'])
+    stopPC = list(csv.reader(stopPCfile))
+    stopPCDict = csvToDict(stopPC)
+	
     # FMS data file input
     # IMPORTANT: make sure there are TWO returns after the last data line, so that the CSV reader will read in the last data line 
     stopFile = open(dataDir + '\\' + dataDirFile['FMSData']) # in dataDir.json, set the data filename
@@ -46,7 +51,7 @@ if __name__ == '__main__':
     timezone = 8 # Singapore timezone - use for NEWER DATA FILES ONLY, which are in UTC
     timezone = 0 # Use 0 for FMSStops_net_mtz.csv
     dayBreakHour = -1 # set to: do not break up activities across days
-    timeline1 = timelineRead(stopsDict, dayBreakHour, timezone) # Construct timelines with ORIGINAL stops
+    timeline1 = timelineRead(stopsDict, stopPCDict, dayBreakHour, timezone) # Construct timelines with ORIGINAL stops
     
     # combine stops of particular types (e.g. work) when close together (e.g. within 350m)
     # NOTE: Run this routine on the timeline BEFORE calculating emissions

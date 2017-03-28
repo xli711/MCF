@@ -6,12 +6,12 @@ from MCF_utilities import *
 
 # TO DO: change timelineReadRevised in MCF_readRevisedFile to match the data dictionary structure below
 # TO DO: add travel time info from FMS 'travel_summaries_xxxxxx.csv' to find gaps in activity logs
-def timelineRead(stops, dayBreakHour, timezone):
+def timelineRead(stops, stopsPC, dayBreakHour, timezone):
     # TO DO: implement activity breaks at dayBreakHour. Current: NO BREAKS
     # dayBreakHour: hour at which to separate the days/activities (midnight = 0); -1 for no breaks   
     dayBreakHour = 0
     days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-    
+
     tl = [] # timeline dictionary
     iU = 0 # user index
     tl.append({})
@@ -28,7 +28,7 @@ def timelineRead(stops, dayBreakHour, timezone):
                 i += 1
         
         # set up NEW USER if userID is different from current userID
-        # Assume that stops are ordered by user IDs
+        # Assume that stops are ordered by user IDs *** IMPORTANT
         if stops[i]['userID'] != tl[iU]['userID']:
             iU += 1
             tl.append({})
@@ -96,6 +96,17 @@ def timelineRead(stops, dayBreakHour, timezone):
             a[-1]['activityType'] = "travel"
             a[-1]['activity'] = stops[i]['travelMode'] 
 
+            pcCurr = 0
+            pcPrev = 0
+            for stopPC in stopsPC:
+                if stopPC['stopID'] == a[-1]['stopID']:
+                    pcCurr = stopPC['postcode']  
+                elif stopPC['stopID'] == a[-1]['stopIDprev']:
+                    pcPrev = stopPC['postcode'] 
+                
+            a[-1]['postalCode'] = pcCurr
+            a[-1]['postalCodePrev'] = pcPrev
+            
             # When the timestamp does not include the Seconds vaule, travel activity time can be 0 minutes.
             # To compensate, insert a 58-second travel activity.
             if len(a) == 0: # first activity for new user
@@ -147,6 +158,12 @@ def timelineRead(stops, dayBreakHour, timezone):
             a[-1]['activity'] = stops[i]['stopType']  
             
         a[-1]['stopID'] = stops[i]['stopID']
+        pcCurr = 0
+        for stopPC in stopsPC:
+            if stopPC['stopID'] == a[-1]['stopID']:
+                pcCurr = stopPC['postcode']     
+        a[-1]['postalCode'] = pcCurr
+        
         a[-1]['startTime'] = stopStart
         a[-1]['endTime'] = stopEnd
         
