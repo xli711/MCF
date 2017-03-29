@@ -107,25 +107,27 @@ if __name__ == '__main__':
     #==============================================================================
     
     with open(dataOutDir + '\\' + dataDirFile['FMSData'][0:-4] + '_timeline.json', 'w') as outfile1:
-         json.dump(timeline1, outfile1, indent=4, encoding="utf-8", sort_keys=True) # Change to indent=None to make minimized JSON file
+         json.dump(timeline1, outfile1, indent=4, sort_keys=True) # Change to indent=None to make minimized JSON file
     
     tlTravelAltFile = dataOutDir + '\\' + dataDirFile['FMSData'][0:-4] + '_alternatives.json'
     if os.path.exists(tlTravelAltFile):
-        print "alternative travel data file already exists"
+        print("alternative travel data file already exists")
         #stops = [ row.strip().split(',') for row in file('FMSStops.csv') ]
     else:
         # Run this routine only if you need the travel alternatives for the current timeline.
         # This routine uses up the Google Directions API Key allowance.
-        print googleApiKey
+        print(googleApiKey)
         tlAlt = travelAlternatives(timeline1, googleApiKey)
         with open(tlTravelAltFile, 'w') as outfile2:
             json.dump(tlAlt, outfile2, indent=4, encoding="utf-8", sort_keys=True) # Change to indent=None to make minimized JSON file
-
+            outfile2.close
     # TO DO: convert JSON/data dictionary to CSV field format    
     
     # Close all files        
-    dataFile.close()
-    Afile.close()
-    stopFile.close()
-    outfile1.close()
-    outfile2.close()
+    dataFile.close
+    Afile.close
+    stopPCfile.close
+    usFile.close
+    stopFile.close
+    outfile1.close
+    
