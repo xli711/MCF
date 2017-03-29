@@ -33,7 +33,7 @@ def stopsRevise(tl, dT, activitiesToCombine):
 
             i += 1
             
-    print "number of stops combined: " + str(combined*2)
+    print("number of stops combined: " + str(combined*2))
     return tl
 
 def travelRevise(tl):
@@ -51,7 +51,7 @@ def travelRevise(tl):
             if a[i]['activityType'] == "travel":
                 j = i + 1
                 while (a[j]['activity'] == "Change Mode/Transfer" or a[j]['activityType'] == "travel") and j < n - 1:
-                    print a[j]['activity']
+                    print(a[j]['activity'])
                     j += 1
 #                    
 #                if a[i]['activity'] == a[i+2]['activity'] and a[i+1]['activityType'] == "travel" and a[i+1]['distance'] < dT:

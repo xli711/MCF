@@ -181,7 +181,7 @@ def travelAlternatives(tl, apiKey):
                         data = simplejson.load(url_out)
                         
                         while data['status'] == 'OVER_QUERY_LIMIT':
-                            print 'Pausing for five minutes...'
+                            print('Pausing for five minutes...')
                             time.sleep(300)
                             url_out = urllib.urlopen(url)
                             data = simplejson.load(url_out)
@@ -190,13 +190,13 @@ def travelAlternatives(tl, apiKey):
                         aAlt[-1]['travelAlt'][-1]['modeQuery'] = mode
                         
                         #print data['routes'][0]
-                        print mode + ': ' + source + ' - ' + destination
+                        print(mode + ': ' + source + ' - ' + destination)
                     
                         if len(data['routes']) > 0:
                             aAlt[-1]['travelAlt'][-1]['route'] = data['routes'][0]                            
                         else:
                             aAlt[-1]['travelAlt'][-1]['route'] = "NONE"
-                            print "NO ROUTE"
+                            print("NO ROUTE")
 #                            with open('points.csv','a+') as outf:
 #                                params = [stops[nS+1][0], stops[nS+1][1], 1, stops[nS+1][2], stops[nS+1][2], lat, lon ]
 #                                outf.write("%s,%s,%s,%s,%s,%s,%s\n" % tuple(params))
@@ -205,6 +205,6 @@ def travelAlternatives(tl, apiKey):
                         time.sleep(2)
         
     else:
-        print "Check MCF_travel_alternatives.py before calling travelAlternatives() function."
+        print("Check MCF_travel_alternatives.py before calling travelAlternatives() function.")
         
     return tlAlt

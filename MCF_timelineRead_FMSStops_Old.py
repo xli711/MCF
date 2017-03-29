@@ -45,7 +45,7 @@ def timelineRead(stops, stopsPC, userSocio, dayBreakHour, timezone):
             stopStart = strToTime(stops[i]['startTime'],timezone,0,False) # newer datasets use 'startTime' label
             stopEnd = strToTime(stops[i]['endTime'],timezone,0,False) # newer datasets use 'endTime' label        
         else: 
-            print "stopID " + str(stops[i]['stopID']) + ": start/stop time data fields not found"
+            print("stopID " + str(stops[i]['stopID']) + ": start/stop time data fields not found")
             
         sTS = time.localtime(stopStart) # struct for start time  
         startDay = int(time.mktime(time.struct_time([sTS.tm_year,sTS.tm_mon,sTS.tm_mday,dayBreakHour,0,0,0,0,0])))
@@ -147,7 +147,7 @@ def timelineRead(stops, stopsPC, userSocio, dayBreakHour, timezone):
             else:
                 a[-1]['distance'] = pos2dist(a[-1]['latPrev'],a[-1]['lonPrev'],a[-1]['lat'],a[-1]['lon'])
         elif stops[i]['travelMode'] != "none" and stopStart < stopEndPrevious:
-            print "stopID " + str(stops[i]['stopID']) + ", " + str(stopStart) + " to " + str(stopEndPrevious) + ": stops are not chronologically ordered"
+            print("stopID " + str(stops[i]['stopID']) + ", " + str(stopStart) + " to " + str(stopEndPrevious) + ": stops are not chronologically ordered")
             
         a.append({})
         if stops[i]['stopType'] == 'Default':
