@@ -3,5 +3,6 @@
 	"dataOutDir": "C:/Users/cressica/Desktop/python/",
 	"activityLookup": "activityLookupSingapore.csv", 
 	"FMSData": "FMSStops_net_mtz.csv",
+	"FMSUserSocio": "FMS_HITS_socio.csv",
 	"FMSDataPostalCode": "FMSStops_net_mtz_postalcode.csv"
 } 

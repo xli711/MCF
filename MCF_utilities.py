@@ -74,7 +74,7 @@ def strToTime(timeStr, timezone, weeks, dayStart):
         else:
             dt = time.strptime(timeStrSplit[0][0] + ' ' + timeStrSplit[0][1], "%d-%m-%Y %H:%M:%S") 
     else:
-        print "unrecognized date format: " + timeStr      
+        print("unrecognized date format: " + timeStr)
     
     # Timestamp structures do not contain time zone info, so we need to change 
     # the time to the correct time zone manually (e.g. +0800 for singapore, if timestamp is UTC)
