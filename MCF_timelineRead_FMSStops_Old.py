@@ -6,7 +6,7 @@ from MCF_utilities import *
 
 # TO DO: change timelineReadRevised in MCF_readRevisedFile to match the data dictionary structure below
 # TO DO: add travel time info from FMS 'travel_summaries_xxxxxx.csv' to find gaps in activity logs
-def timelineRead(stops, stopsPC, dayBreakHour, timezone):
+def timelineRead(stops, stopsPC, userSocio, dayBreakHour, timezone):
     # TO DO: implement activity breaks at dayBreakHour. Current: NO BREAKS
     # dayBreakHour: hour at which to separate the days/activities (midnight = 0); -1 for no breaks   
     dayBreakHour = 0
@@ -15,7 +15,7 @@ def timelineRead(stops, stopsPC, dayBreakHour, timezone):
     tl = [] # timeline dictionary
     iU = 0 # user index
     tl.append({})
-    tl[iU]['userID'] = stops[0]['userID']
+    tl[iU]['userID'] = stops[0]['userID']    
     tl[iU]['activities'] = []
     
     n = len(stops)
