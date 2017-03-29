@@ -40,7 +40,14 @@ if __name__ == '__main__':
     stopPCfile = open(dataDir + '\\' + dataDirFile['FMSDataPostalCode'])
     stopPC = list(csv.reader(stopPCfile))
     stopPCDict = csvToDict(stopPC)
-	
+
+    # FMS User ID to HITS socioeconomic data file
+    # TODO: extend to other user datafiles, including FMS presurvey
+    usFile = open(dataDir + '\\' + dataDirFile['FMSUserSocio'])
+    us = list(csv.reader(usFile))
+    usDict = csvToDict(us)
+
+
     # FMS data file input
     # IMPORTANT: make sure there are TWO returns after the last data line, so that the CSV reader will read in the last data line 
     stopFile = open(dataDir + '\\' + dataDirFile['FMSData']) # in dataDir.json, set the data filename
@@ -51,14 +58,16 @@ if __name__ == '__main__':
     timezone = 8 # Singapore timezone - use for NEWER DATA FILES ONLY, which are in UTC
     timezone = 0 # Use 0 for FMSStops_net_mtz.csv
     dayBreakHour = -1 # set to: do not break up activities across days
-    timeline1 = timelineRead(stopsDict, stopPCDict, dayBreakHour, timezone) # Construct timelines with ORIGINAL stops
+    timeline1 = timelineRead(stopsDict, stopPCDict, usDict, dayBreakHour, timezone) # Construct timelines with ORIGINAL stops
     
+    # REVISE THE ACTIVITY TIMELINE
     # combine stops of particular types (e.g. work) when close together (e.g. within 350m)
     # NOTE: Run this routine on the timeline BEFORE calculating emissions
-    distanceTolerance = 350
+    distanceTolerance = 250
     # TO DO: add the combine option/switch to the activityLookup file
     activitiesToCombine = ['Home','Work','Work-Related Business','Education','Pick Up/Drop Off','Other Home','Other (stop)']
     timeline1 = stopsRevise(timeline1, distanceTolerance, activitiesToCombine) 
+    #timeline1 = travelRevise(timeline1)
     
     timeline1 = timelineEmissionsCalc(timeline1, aDict) # add emissions info to timeline1
 
