@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # TO DO: add the combine option/switch to the activityLookup file
     activitiesToCombine = ['Home','Work','Work-Related Business','Education','Pick Up/Drop Off','Other Home','Other (stop)']
     timeline1 = stopsRevise(timeline1, distanceTolerance, activitiesToCombine) 
-    #timeline1 = travelRevise(timeline1)
+    timeline1 = travelRevise(timeline1)
     
     timeline1 = timelineEmissionsCalc(timeline1, aDict) # add emissions info to timeline1
 
