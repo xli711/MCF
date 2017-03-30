@@ -19,13 +19,19 @@ def timelineEmissionsCalc(tl, em):
 
     for tlU in tl:
         for a in tlU['activities']:
-            
+            a['emissionsKg'] = 0
+             
             if a['activityType'] == "stop":
                 d = a['duration'] #duration in minutes
                 a['emissionsKg'] = activityEmissionsCalc(a['activity'], d, em)
             elif a['activityType'] == "travel":
-                d = float(a['distance'])/1000 #distance in kilometers for emissions calc
-                a['emissionsKg'] = activityEmissionsCalc(a['activity'], d, em)
+                if 'travelModeDist' in a:
+                    for key, dS in a['travelModeDist'].items(): # use iteritems for py2.7
+                        d = float(dS)/1000 #distance in kilometers for emissions calc
+                        a['emissionsKg'] += activityEmissionsCalc(key, d, em)
+                else:
+                    d = float(a['distance'])/1000 #distance in kilometers for emissions calc
+                    a['emissionsKg'] = activityEmissionsCalc(a['activity'], d, em)                  
             else:                
                 a['emissionsKg'] = "unknown" #unknown if activityType == "gap" or other
     

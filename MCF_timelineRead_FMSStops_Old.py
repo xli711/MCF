@@ -180,6 +180,11 @@ def timelineRead(stops, stopsPC, userSocio, dayBreakHour, timezone):
   
         i += 1
     
+    # Add socioeconomic data by iterating through users
+    for U in tl: 
+        for uS in userSocio:
+            if U['userID'] == uS['FMSid']:
+                U['userCharacteristics'] = uS             
       
     
     return tl
