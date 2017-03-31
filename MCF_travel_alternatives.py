@@ -109,30 +109,43 @@ def output_routes(mode, routes, stops, nS):
     return 'none', 'none'
 
 def travelAlternatives(tl, apiKey):
-    I_KNOW_WHAT_I_AM_DOING = False  
-    tlAlt = [] # alternative travel dictionary
+    I_KNOW_WHAT_I_AM_DOING = True
+    apiCount = 0
+    travelModeDist = 0
+    tlUAlt = []
     
     if (I_KNOW_WHAT_I_AM_DOING):
         
         modes = ['walking', 'driving', 'bus', 'subway'] # TO DO: specify 'bicycling' where available
         transitModes = ['bus', 'subway'] # TO DO: add other transit modes, if necessary
+        modesMap = {'walking':'Foot', 'driving':'Car/Van', 'bus':'Bus', 'subway':'LRT/MRT'} # mapping for Singapore FMS modes
         
         for tlU in tl:
-            tlAlt.append({})
-            tlAlt[-1]['userID'] = tlU['userID']
-            tlAlt[-1]['activities'] = []
-            aAlt = tlAlt[-1]['activities']
+            tlUAlt.append({})
+            tlUAlt[-1]['userID'] = tlU['userID']
+            tlUAlt[-1]['activities'] = []
+            tlAlt = tlUAlt[-1]['activities']
             
             for a in tlU['activities']:
-                if a['activityType'] == "travel":
-                    aAlt.append({})
-                    aAlt[-1]['stopID'] = a['stopID']
-                    aAlt[-1]['stopIDprev'] = a['stopIDprev']      
-                    aAlt[-1]['travelAlt'] = []
-                                                            
-                    # add ~4 years to ensure date is in future & is on same day of week as original date
-                    # TO DO: change date to future time for any FMS file (4 years is for 2013 dataset)                    
-                    departureTime = a['startTime'] + 4*52*7*24*60*60                
+                if a['activityType'] == "travel" and a['activity'] == "Foot" and float(a['distance']) <= 500:
+                    a['travelAlt'] = 'Foot travel distance less than 500m' # do not collect alternatives for short trips
+                    
+                elif a['activityType'] == "travel":
+                    a['travelAlt'] = []
+                    tlAlt.append({})
+                    tlAlt[-1]['activity'] = a['activity']
+                    tlAlt[-1]['stopID'] = a['stopID']
+                    tlAlt[-1]['stopIDprev'] = a['stopIDprev']
+                    tlAlt[-1]['altModes'] = []
+                         
+                    # add ~4 years to ensure date is in future & is on same day of week as original date, for use in google directions API
+                    # TO DO: change date to future time for any FMS file (4 years is for 2013 dataset) 
+                    dTdiff = a['startTime'] - 1366603200 # 1366603200 is earliest timestamp in FMS_net_mtz.csv
+                    dT = 1366603200 + dTdiff % (7*24*60*60) #change current timestamp to same week as earliest timestamp
+                              
+                    departureTime = dT + (4*52-2)*7*24*60*60 - 12*60*60
+                                        
+                    #print("original: " + str(a['startTime']) + " diff: " + str(dTdiff) + " new time: " + str(dT) + " future time: " + str(departureTime))
                     lat_f = a['lat'] 
                     lon_f = a['lon']
                     lat = a['latPrev']
@@ -140,25 +153,8 @@ def travelAlternatives(tl, apiKey):
                     source = '%s,%s' % (lat, lon)
                     destination = '%s,%s' % (lat_f, lon_f)
                     
-                    #dist_range = 1 # distance between the points we will record 
-#                        if mode == 'Foot':
-#                            mode = 'walking'
-#                            dist_range = 0.5
-#                        elif mode == 'Car/Van':
-#                            mode = 'driving'
-#                        elif mode == 'Taxi':
-#                            mode = 'driving'
-#                        elif mode == 'LRT/MRT':
-#                            mode = 'transit'
-#                        elif mode == 'Bus':
-#                            mode = 'transit'
-#                        elif mode == 'Bicycle':
-#                            mode = 'walking' 
-#                            dist_range = 0.5
-#                        else:
-#                            mode = 'driving'
                     for mode in modes:
-                        
+                        # Currently only queries Google's first route option                         
                         # TO DO: get alternative routes (set alternatives to 'true')
                         # TO DO: get alternative travel times (other than best_guess)
                         params = {
@@ -176,35 +172,80 @@ def travelAlternatives(tl, apiKey):
                             params['mode'] = 'transit'
                             params['transit_mode'] = mode
             
-                        url = DIRECTIONS_BASE_URL + '?' + urllib.urlencode(params)  
-                        url_out = urllib.urlopen(url)
+                        url = DIRECTIONS_BASE_URL + '?' + urllib.parse.urlencode(params) # use urllib.urlencode in py2.7
+                        url_out = urllib.request.urlopen(url) # use urllib.urlopen in py2.7
                         data = simplejson.load(url_out)
+                        apiCount += 1
                         
                         while data['status'] == 'OVER_QUERY_LIMIT':
                             print('Pausing for five minutes...')
-                            time.sleep(300)
-                            url_out = urllib.urlopen(url)
+                            time.sleep(3)
+                            url_out = urllib.request.urlopen(url)
                             data = simplejson.load(url_out)
+                            apiCount += 1
                         
-                        aAlt[-1]['travelAlt'].append({})
-                        aAlt[-1]['travelAlt'][-1]['modeQuery'] = mode
-                        
-                        #print data['routes'][0]
-                        print(mode + ': ' + source + ' - ' + destination)
-                    
-                        if len(data['routes']) > 0:
-                            aAlt[-1]['travelAlt'][-1]['route'] = data['routes'][0]                            
-                        else:
-                            aAlt[-1]['travelAlt'][-1]['route'] = "NONE"
-                            print("NO ROUTE")
-#                            with open('points.csv','a+') as outf:
-#                                params = [stops[nS+1][0], stops[nS+1][1], 1, stops[nS+1][2], stops[nS+1][2], lat, lon ]
-#                                outf.write("%s,%s,%s,%s,%s,%s,%s\n" % tuple(params))
-#                            timings, dist = output_routes(mode, data['routes'], stops, nS)
+                        a['travelAlt'].append({})
+                        a['travelAlt'][-1]['googleMode'] = mode
+                        a['travelAlt'][-1]['activity'] = modesMap[mode]
+                        #a['travelAlt'][-1]['transferDuration'] = 0
+                         
+                        #print(mode + ': ' + source + ' - ' + destination)
+                        tlAlt[-1]['altModes'].append({})
+                        tlAlt[-1]['altModes'][-1]['mode'] = mode
+                             
+                        if len(data['routes']) > 0:              
+                            tlAlt[-1]['altModes'][-1]['route'] = data['routes'][0]
+                             
+                            leg = data['routes'][0]['legs'][0]
+                            travelModeDist = dict.fromkeys(['Car/Van','Taxi','Bus','Other (travel)','Motorcycle/Scooter','LRT/MRT','Bicycle','Foot'],0)
+    
+                            a['travelAlt'][-1]['duration'] = leg['duration']['value']/60
+                             
+                            if mode == 'walking':
+                                travelModeDist['Foot'] = leg['distance']['value']
                                 
-                        time.sleep(2)
+                            elif mode == 'driving':
+                                a['travelAlt'][-1]['durationInTraffic'] = leg['duration_in_traffic']['value']/60
+                                travelModeDist['Car/Van'] = leg['distance']['value']
+                                
+                            else: 
+                                a['travelAlt'][-1]['transfers'] = -1
+                                 
+                                if 'departure_time' in leg:
+                                    a['travelAlt'][-1]['startTime'] = leg['departure_time']['value']
+                                    a['travelAlt'][-1]['endTime'] = leg['arrival_time']['value']
+                                else:
+                                    a['travelAlt'][-1]['transfers'] = "Not found"                                
+                                    #print("Departure time not found")
+                                    #print(leg)
+
+                                for step in leg['steps']:
+                                    if step['travel_mode'] == "WALKING": 
+                                        travelModeDist['Foot'] += step['distance']['value']
+                                        
+                                    elif step['travel_mode'] == "TRANSIT": 
+                                        a['travelAlt'][-1]['transfers'] += 1
+                                        
+                                        if step['transit_details']['line']['vehicle']['type'] == "SUBWAY" or step['transit_details']['line']['vehicle']['type'] == "TRAM":
+                                            travelModeDist['LRT/MRT'] += step['distance']['value']   
+                                        elif step['transit_details']['line']['vehicle']['type'] == "BUS":
+                                            travelModeDist['Bus'] += step['distance']['value']   
+                                        else:
+                                            print("Transit type not recognized: " + step['transit_details']['line']['vehicle']['type'])
+                            
+                            a['travelAlt'][-1]['travelModeDist'] = dict(travelModeDist)
+
+                        else:
+                            tlAlt[-1]['altModes'][-1]['route'] = "NONE"
+                            print("NO ROUTE")
+
+                        time.sleep(0.02)
+                        
+            print("API calls: " + str(apiCount))
         
     else:
         print("Check MCF_travel_alternatives.py before calling travelAlternatives() function.")
+    
+    
         
-    return tlAlt
+    return tl, tlUAlt

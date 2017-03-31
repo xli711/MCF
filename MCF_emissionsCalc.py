@@ -24,6 +24,7 @@ def timelineEmissionsCalc(tl, em):
             if a['activityType'] == "stop":
                 d = a['duration'] #duration in minutes
                 a['emissionsKg'] = activityEmissionsCalc(a['activity'], d, em)
+                
             elif a['activityType'] == "travel":
                 if 'travelModeDist' in a:
                     for key, dS in a['travelModeDist'].items(): # use iteritems for py2.7
@@ -32,6 +33,16 @@ def timelineEmissionsCalc(tl, em):
                 else:
                     d = float(a['distance'])/1000 #distance in kilometers for emissions calc
                     a['emissionsKg'] = activityEmissionsCalc(a['activity'], d, em)                  
+
+                if 'travelAlt' in a:
+                    if a['travelAlt'] != 'Foot travel distance less than 500m':
+                        for tAlt in a['travelAlt']:
+                            if 'travelModeDist' in tAlt:
+                                tAlt['emissionsKg'] = 0
+                                    
+                                for key, dS in tAlt['travelModeDist'].items(): # use iteritems for py2.7
+                                    d = float(dS)/1000 #distance in kilometers for emissions calc
+                                    tAlt['emissionsKg'] += activityEmissionsCalc(key, d, em)
             else:                
                 a['emissionsKg'] = "unknown" #unknown if activityType == "gap" or other
     
