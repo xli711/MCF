@@ -68,6 +68,12 @@ if __name__ == '__main__':
     activitiesToCombine = ['Home','Work','Work-Related Business','Education','Pick Up/Drop Off','Other Home','Other (stop)']
     timeline1 = stopsRevise(timeline1, distanceTolerance, activitiesToCombine) 
     timeline1 = travelRevise(timeline1)
+
+    # Run this routine only if you need the travel alternatives for the current timeline.
+    # SEE for travel alternatives output
+    # This routine uses up the Google Directions API Key allowance.
+    
+    #timeline1, tlAlt = travelAlternatives(timeline1, googleApiKey)
     
     timeline1 = timelineEmissionsCalc(timeline1, aDict) # add emissions info to timeline1
 
@@ -105,24 +111,16 @@ if __name__ == '__main__':
     #         cw.writerow(row)
     # End REVISION Function code
     #==============================================================================
+
     
+    # TO DO: convert JSON/data dictionary to CSV field format    
     with open(dataOutDir + '\\' + dataDirFile['FMSData'][0:-4] + '_timeline.json', 'w') as outfile1:
          json.dump(timeline1, outfile1, indent=4, sort_keys=True) # Change to indent=None to make minimized JSON file
-    
-    tlTravelAltFile = dataOutDir + '\\' + dataDirFile['FMSData'][0:-4] + '_alternatives.json'
-    if os.path.exists(tlTravelAltFile):
-        print("alternative travel data file already exists")
-        #stops = [ row.strip().split(',') for row in file('FMSStops.csv') ]
-    else:
-        # Run this routine only if you need the travel alternatives for the current timeline.
-        # This routine uses up the Google Directions API Key allowance.
-        print(googleApiKey)
-        tlAlt = travelAlternatives(timeline1, googleApiKey)
-        with open(tlTravelAltFile, 'w') as outfile2:
-            json.dump(tlAlt, outfile2, indent=4, encoding="utf-8", sort_keys=True) # Change to indent=None to make minimized JSON file
-            outfile2.close
-    # TO DO: convert JSON/data dictionary to CSV field format    
-    
+
+#   Use this data output when finding travel alternatives
+#    with open(dataOutDir + '\\' + dataDirFile['FMSData'][0:-4] + '_alternatives.json', 'w') as tlAltFile:
+#         json.dump(tlAlt, tlAltFile, indent=4, sort_keys=True) # Change to indent=None to make minimized JSON file
+         
     # Close all files        
     dataFile.close
     Afile.close
@@ -130,4 +128,6 @@ if __name__ == '__main__':
     usFile.close
     stopFile.close
     outfile1.close
+    apifile.close
+    tlAltFile.close
     

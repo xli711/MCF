@@ -13,7 +13,8 @@ def stopsRevise(tl, dT, activitiesToCombine):
 
         i = 0 # activity index
         while i < n - 2: 
-                
+            #print(str(a[i]['startTime']))
+            
             # TO DO: make compatible with interval format, which can have stops without travel activities between stops
             # TO DO: revise the stopIDs for travel activities, based on combined stops?
             if a[i]['activityType'] == "stop":
@@ -23,13 +24,11 @@ def stopsRevise(tl, dT, activitiesToCombine):
                         a[i]['endTime'] = a[i+2]['endTime']
                         a[i]['duration'] = float(a[i]['endTime'] - a[i]['startTime'] )/60 # duration in minutes  
                         a[i]['endDate'] = a[i+2]['endDate']
-                        #print a[i+1]
+
                         a.pop(i+1) # remove travel activity
                         a.pop(i+1) # remove second stop activity
                         n = n - 2                        
                         combined += 1
-                    #else:
-                        #print a[i]['activity'] + " stopID " + a[i]['stopID'] + ": not combined"
 
             i += 1
             
@@ -115,8 +114,8 @@ def travelRevise(tl):
                         a[i]['activity'] = "Foot" 
        
         
-                    print(a[i]['activity'] + " " + str(transfers))
-                    print(a[i]['travelModeDist'])
+                    #print(a[i]['activity'] + " " + str(transfers))
+                    #print(a[i]['travelModeDist'])
                     
                     for tS in range(i+1,j):
                         a.pop(i+1) # remove travel and transfer activities                      
