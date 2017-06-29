@@ -186,13 +186,7 @@ def timelineRead(stops, stopsPC, userSocio, dayBreakHour, timezone):
     for U in tl:
 
         for uS in userSocio:
-            # if uS['FMSid'] == "1729" and U['userID'] == "1729":
-            #     print(uS['FMSid'])
             if U['userID'] == uS['FMSid']:
-                print(U['userID'] + ' ' + uS['FMSid'])
                 U['userCharacteristics'] = uS
-        # if 'userCharacteristics' not in U:
-        #     uIndex = tl.index(U)
-        #     del tl[uIndex]
-
+                #print(uS)
     return tl

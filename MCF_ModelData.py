@@ -55,6 +55,9 @@ if __name__ == '__main__':
 
                 entries.append([ID, user['userID'], episode['activity'], tripPurpose, episode['startDay'],
                                 episode['startTime'], episode['endTime'], episode['postalCodePrev'],
+                                beLookUp[episode['postalCodePrev']][kIndex],
+                                beLookUp[episode['postalCodePrev']][lcaIndex], episode['postalCode'],
+                                beLookUp[episode['postalCode']][kIndex], beLookUp[episode['postalCode']][lcaIndex],
                                 usChar['H2_DwellingType'], usChar['H3_Ethnic'], usChar['H4_TotalPax'],
                                 usChar['H5_VehAvailable'], usChar['H8_BikeQty'], usChar['P1_Age'], usChar['P2_Gender'],
                                 usChar['P3c_NoLicense'], usChar['P5_Employ'], usChar['P6Industry'], usChar['P6_Occup'],
@@ -65,13 +68,13 @@ if __name__ == '__main__':
     with open(dataOutDir + '/data.csv', 'w', newline='') as data:
         try:
             writer = csv.writer(data)
-            writer.writerow(('ID', 'userID', 'mode', 'tripPurpose', 'startDay', 'startTime', 'endTime', 'postalCode',
-                             'postalCodePrev', 'carTT', 'carCost', 'carEmission', 'mrtTT', 'mrtCost', 'mrtEmission',
-                             'busTT', 'busCost', 'busEmission', 'walkTT', 'walkCost', 'walkEmission', 'oPostCode',
+            writer.writerow(('ID', 'userID', 'mode', 'tripPurpose', 'startDay', 'startTime', 'endTime', 'oPostCode',
                              'oKCluster', 'oLCACluster', 'dPostCode', 'dKCluster', 'dLCACluster', 'dwellingType',
                              'ethnicity', 'HHSize', 'vehicles', 'bikes', 'age', 'gender', 'noLicense', 'employed',
                              'industry', 'occupation', 'workHrs'))  # Header row
-
+            # Variables that should have been included:
+            #'carTT', 'carCost', 'carEmission', 'mrtTT', 'mrtCost', 'mrtEmission',
+            #'busTT', 'busCost', 'busEmission', 'walkTT', 'walkCost', 'walkEmission',
             for row in entries:
                 writer.writerow(row)  # Data rows
 
