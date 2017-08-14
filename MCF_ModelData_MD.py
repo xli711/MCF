@@ -1,6 +1,8 @@
 import csv
 import json
 import os.path
+import pandas as pd
+import numpy as np
 #%%
 if __name__ == '__main__':
 
@@ -12,26 +14,33 @@ if __name__ == '__main__':
     # set different output directory, so that temporary files do not upload to MCF Dropbox
     dataOutDir = os.path.normpath(dataDirFile['dataOutDir'])
 
-    with open(dataDir + '/FMSStops_all_timeline.json') as tl:
-        timeLines = json.load(tl)
+#    with open(dataDir + '/FMSStops_all_timeline.json') as tl:
+#        timeLines = json.load(tl)
+#
+#    #with open(dataDir + '/FMSStops_net_mtz_timeline_with_alternatives.json') as alt:
+#        #alternatives = json.load(alt)
+#
+#    with open(dataDir + '/PostalCode_BE_measures_clusters.csv') as be:
+#        beMeasures = csv.reader(be)
+#        beLookUp = {row[0]: row for row in beMeasures}
+#
+#    farIndex = beLookUp['postcode'].index('FAR')
+#    heightIndex = beLookUp['postcode'].index('avgbuildhe')
+#    builtDensIndex = beLookUp['postcode'].index('built_dens')
+#    luMixIndex = beLookUp['postcode'].index('Use_mix')
+#    busIndex = beLookUp['postcode'].index('busstops')
+#    mrtIndex = beLookUp['postcode'].index('mrt')
+#    intersectIndex = beLookUp['postcode'].index('countjunct')
+#    fourwayDensIndex = beLookUp['postcode'].index('perc_fourw')
+#    pathLengIndex = beLookUp['postcode'].index('lenfootpat')
+#    porousIndex = beLookUp['postcode'].index('porousarea')
+    
+    costs = pd.read_csv(dataDir + '/OPcosts.314', sep='\s+')
+    trips = pd.read_csv(dataDir + '/FMSStops_all_BE.csv')
+#%%
+    trips_w = trips.loc[trips['tripPurpose'] == 'Work']
+    uniqDest = trips_w['dPostCode'].unique()
 
-    #with open(dataDir + '/FMSStops_net_mtz_timeline_with_alternatives.json') as alt:
-        #alternatives = json.load(alt)
-
-    with open(dataDir + '/PostalCode_BE_measures_clusters.csv') as be:
-        beMeasures = csv.reader(be)
-        beLookUp = {row[0]: row for row in beMeasures}
-
-    farIndex = beLookUp['postcode'].index('FAR')
-    heightIndex = beLookUp['postcode'].index('avgbuildhe')
-    builtDensIndex = beLookUp['postcode'].index('built_dens')
-    luMixIndex = beLookUp['postcode'].index('Use_mix')
-    busIndex = beLookUp['postcode'].index('busstops')
-    mrtIndex = beLookUp['postcode'].index('mrt')
-    intersectIndex = beLookUp['postcode'].index('countjunct')
-    fourwayDensIndex = beLookUp['postcode'].index('perc_fourw')
-    pathLengIndex = beLookUp['postcode'].index('lenfootpat')
-    porousIndex = beLookUp['postcode'].index('porousarea')
 #%%
     #kIndex = beLookUp['postcode'].index('Kmeans_clust')
     #lcaIndex = beLookUp['postcode'].index('LCA_clust')

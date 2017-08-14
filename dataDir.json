@@ -1,6 +1,6 @@
 {
-	"dataDir": "C:/Users/cressica/Dropbox (MIT)/MCF 2016/MCF_git_data/", 
-	"dataOutDir": "C:/Users/cressica/Desktop/python/",
+	"dataDir": "/Users/lixinhui/Dropbox (MIT)/W-FMS-BE/MCF 2016/MCF_git_data/", 
+	"dataOutDir": "/Users/lixinhui/Dropbox (MIT)/W-FMS-BE/BE 17/git/MCF_Output/",
 	"activityLookup": "activityLookupSingapore.csv", 
 	"FMSData": "FMSStops_net_mtz.csv",
 	"FMSUserSocio": "FMS_HITS_socio.csv",
