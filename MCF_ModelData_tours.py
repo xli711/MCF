@@ -18,7 +18,7 @@ if __name__ == '__main__':
         
 #%%
     with open(dataDir + '/mode_priority_lookup.csv') as modeCsv:
-        modePriority = csv.reader(mode)
+        modePriority = csv.reader(modeCsv)
         modeLookup = {row[1]: int(row[0]) for row in modePriority}
 #%%
     #kIndex = beLookUp['postcode'].index('Kmeans_clust')
@@ -43,6 +43,8 @@ if __name__ == '__main__':
                     
                     homePostCode = episode['postalCode']
                     destPostCode = ''
+                    homeStopId = episode['stopID']
+                    destStopId = ''
                     
                     modeCode = 16
                     duration = 0
@@ -57,13 +59,15 @@ if __name__ == '__main__':
                         #print(downstreamEpisodes.index(downstreamEpisode))
                         if downstreamEpisode['activity'] != 'Home':
                             tour.append(downstreamEpisode)
-                            if downstreamEpisode['activityType'] == 'stop' and downstreamEpisode['activity'] != 'Change Mode/Transfer' and downstreamEpisode['duration'] > duration:
+                            if downstreamEpisode['activityType'] == 'stop' and downstreamEpisode['activity'] != 'Change Mode/Transfer':
                                 stops += 1
-                                duration = downstreamEpisode['duration']
-                                tripPurpose = downstreamEpisode['activity']
-                                destPostCode = downstreamEpisode['postalCode']
-                                purposeFound = True
-                                primaryIndex = downstreamEpisodes.index(downstreamEpisode)
+                                if downstreamEpisode['duration'] > duration:
+                                    duration = downstreamEpisode['duration']
+                                    tripPurpose = downstreamEpisode['activity']
+                                    destPostCode = downstreamEpisode['postalCode']
+                                    destStopId = downstreamEpisode['stopID']
+                                    purposeFound = True
+                                    #primaryIndex = downstreamEpisodes.index(downstreamEpisode)
                             elif downstreamEpisode['activityType'] == 'travel' and downstreamEpisode['distance'] != 0:
                                 if downstreamEpisode['activity'] in list(modeLookup.keys()) and modeLookup[downstreamEpisode['activity']] < modeCode:
                                     modeCode = modeLookup[downstreamEpisode['activity']]
@@ -81,22 +85,22 @@ if __name__ == '__main__':
                     tourEndTime = tour[-1]['startTime']
                     
                     # Create entry
-                    if len(tour) > 2:
+                    if len(tour) > 2 and stops > 0:
                         tours.append(tour)
-                        entries.append([ID, user['userID'], tripPurpose, mode, stops, homePostCode, destPostCode, tourStartTime, tourEndTime,
+                        entries.append([ID, user['userID'], tripPurpose, mode, stops, homePostCode, destPostCode, homeStopId, destStopId, tourStartTime, tourEndTime,
                                         usChar['H2_DwellingType'], usChar['H3_Ethnic'], usChar['H4_TotalPax'],
                                         usChar['H5_VehAvailable'], usChar['H8_BikeQty'], usChar['P1_Age'], usChar['P2_Gender'],
                                         usChar['P3c_NoLicense'], usChar['P5_Employ'], usChar['P6Industry'], usChar['P6_Occup'],
-                                        usChar['P7_WorkHrs']])
+                                        usChar['P7_WorkHrs'], usChar['PostalCode']])
         
                         ID += 1
 #%%
     with open(dataOutDir + '/tours_data.csv', 'w', newline='') as data:
         try:
             writer = csv.writer(data)
-            writer.writerow(('ID', 'userID', 'tripPurpose', 'mode', 'stops', 'homePostCode', 'destPostCode', 'tourStartTime', 'tourEndTime',
+            writer.writerow(('ID', 'userID', 'tripPurpose', 'mode', 'stops', 'homePostCode', 'destPostCode', 'homeStopId', 'destStopId', 'tourStartTime', 'tourEndTime',
                              'dwellingType','ethnicity', 'HHSize', 'vehicles', 'bikes', 'age', 'gender', 'noLicense', 'employed',
-                             'industry', 'occupation', 'workHrs'))  # Header row
+                             'industry', 'occupation', 'workHrs', 'HITShomePC'))  # Header row
             # Variables that should have been included:
             #'carTT', 'carCost', 'carEmission', 'mrtTT', 'mrtCost', 'mrtEmission',
             #'busTT', 'busCost', 'busEmission', 'walkTT', 'walkCost', 'walkEmission',
