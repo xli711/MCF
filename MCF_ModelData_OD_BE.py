@@ -18,7 +18,7 @@ if __name__ == '__main__':
     shopping_df = pd.read_csv(dataOutDir + '/tours_shopping.csv')
     sample_pc_df = pd.read_csv(dataDir + '/PostalCodeLookup_150m_Sample.csv')
     sample_lookup = sample_pc_df.set_index('PC_original')['PC_sample'].to_dict()
-    shopping_df['homePC_sample'] = shopping_df['HITShomePC'].map(sample_lookup)
+    shopping_df['homePC_sample'] = shopping_df['HITShomePC'].map(sample_lookup) ## Two of the HITS home postal codes could not be matched to sample
     shopping_df['destPC_sample'] = shopping_df['destPostCode'].map(sample_lookup)
 #%%    
     #Step 2: BE measures lookup for all unique postal codes
@@ -40,12 +40,10 @@ if __name__ == '__main__':
     mtz_lookup =  pc_mtz.set_index('postcode')['MTZ_1169'].to_dict()
     
     #map postal code to sample postal code first
-    shopping_df['homePC_s'] = shopping_df['homePostCode'].map(sample_lookup)
-    shopping_df['destPC_s'] = shopping_df['destPostCode'].map(sample_lookup)
     shopping_alt_be_df['PC_s'] = shopping_alt_be_df['postcode'].map(sample_lookup)
     #then map sample postal code to mtz
-    shopping_df['homeMTZ'] = shopping_df ['homePC_s'].map(mtz_lookup)
-    shopping_df['destMTZ'] = shopping_df ['destPC_s'].map(mtz_lookup)
+    shopping_df['homeMTZ'] = shopping_df ['homePC_sample'].map(mtz_lookup)
+    shopping_df['destMTZ'] = shopping_df ['destPC_sample'].map(mtz_lookup)
     shopping_alt_be_df ['MTZ'] = shopping_alt_be_df['PC_s'].map(mtz_lookup)
     all_pc = pc_mtz.postcode.unique().tolist()
 #%%    
